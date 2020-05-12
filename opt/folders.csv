@@ -1,0 +1,16 @@
+.,.,,
+base,base,,"h,cc"
+base/debug,base/debug,,"h,cc"
+base/files,base/files,,"h,cc"
+base/fuchsia,base/fuchsia,,"h,cc"
+base/mac,base/mac,,"h,cc,mm"
+base/memory,base/memory,,h
+base/metrics,base/metrics,,h
+base/numerics,base/numerics,,h
+base/posix,base/posix,,"h,cc"
+base/process,base/process,,"h,cc"
+base/strings,base/strings,,"h,cc,mm"
+base/synchronization,base/synchronization,,"h,cc"
+base/third_party/icu,base/third_party/icu,,"h,cc,LICENSE"
+base/threading,base/threading,,"h,cc"
+build,build,,build_config.h
