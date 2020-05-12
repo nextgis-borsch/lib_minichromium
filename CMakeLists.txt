@@ -21,7 +21,7 @@
 ################################################################################
 
 cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
-project(mini_chromium)
+project(minichromium)
 
 if(NOT DEFINED PACKAGE_VENDOR)
     set(PACKAGE_VENDOR NextGIS)
@@ -67,147 +67,73 @@ string(TOUPPER ${PACKAGE_NAME} PACKAGE_UPPER_NAME)
 set(LIB_NAME ${PROJECT_NAME})
 set(TARGETS ${LIB_NAME})
 
-set(VERSION 1.0.0)
+include(util)
 
-#add_library(${LIB_NAME} STATIC)
-function(mc_append_sources)
-    list(TRANSFORM ARGN PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/base/")
-    target_sources(${LIB_NAME} PRIVATE ${ARGN})
-endfunction()
-
+set(VERSION 0.0.1)
+report_version(${PROJECT_NAME} ${VERSION})
 
 if(BUILD_SHARED_LIBS)
-    #add_library(${LIB_NAME} SHARED ${TARGET_OBJECTS} ${PUBLIC_HDRS} ${RESOURCE_FILES})
 	add_library(${LIB_NAME} SHARED)
-    set_target_properties(${LIB_NAME} PROPERTIES VERSION ${VERSION})
-    if(MSVC)
-        #set_target_properties(${LIB_NAME} PROPERTIES SUFFIX "-${MAJOR_VER}_${MINOR_VER}.dll")
-    endif()
 else()
-    #add_library(${LIB_NAME} STATIC ${TARGET_OBJECTS} ${PUBLIC_HDRS})
-	add_library(${LIB_NAME} STATIC)
-    set_target_properties(${LIB_NAME} PROPERTIES VERSION ${VERSION})
+	add_library(${LIB_NAME} STATIC) 
 endif()
 
-mc_append_sources(
-    ../build/build_config.h
-    atomicops.h
-    atomicops_internals_atomicword_compat.h
-    atomicops_internals_portable.h
-    auto_reset.h
-    bit_cast.h
-    compiler_specific.h
-    debug/alias.cc
-    debug/alias.h
-    files/file_path.cc
-    files/file_path.h
-    files/file_util.h
-    files/scoped_file.cc
-    files/scoped_file.h
-    format_macros.h
-    logging.cc
-    logging.h
-    macros.h
-    memory/free_deleter.h
-    memory/scoped_policy.h
-    metrics/histogram_functions.h
-    metrics/histogram_macros.h
-    metrics/persistent_histogram_allocator.h
-    numerics/checked_math.h
-    numerics/checked_math_impl.h
-    numerics/clamped_math.h
-    numerics/clamped_math_impl.h
-    numerics/safe_conversions.h
-    numerics/safe_conversions_arm_impl.h
-    numerics/safe_conversions_impl.h
-    numerics/safe_math.h
-    numerics/safe_math_arm_impl.h
-    numerics/safe_math_clang_gcc_impl.h
-    numerics/safe_math_shared_impl.h
-    process/memory.cc
-    process/memory.h
-    process/process_metrics.h
-    rand_util.cc
-    rand_util.h
-    scoped_clear_last_error.h
-    scoped_generic.h
-    stl_util.h
-    strings/string16.cc
-    strings/string16.h
-    strings/string_number_conversions.cc
-    strings/string_number_conversions.h
-    strings/string_piece.h
-    strings/string_util.h
-    strings/stringprintf.cc
-    strings/stringprintf.h
-    strings/sys_string_conversions.h
-    strings/utf_string_conversion_utils.h
-    strings/utf_string_conversions.cc
-    strings/utf_string_conversions.h
-    synchronization/condition_variable.h
-    synchronization/lock.cc
-    synchronization/lock.h
-    synchronization/lock_impl.h
-    sys_byteorder.h
-    template_util.h
-    third_party/icu/icu_utf.cc
-    third_party/icu/icu_utf.h
-    threading/thread_local_storage.cc
-    threading/thread_local_storage.h
+set_target_properties(${LIB_NAME} PROPERTIES VERSION ${VERSION})
+
+target_sources(${LIB_NAME} PRIVATE
+    base/debug/alias.cc
+    base/files/file_path.cc
+    base/files/scoped_file.cc
+    base/logging.cc
+    base/process/memory.cc
+    base/rand_util.cc
+    base/strings/string16.cc
+    base/strings/string_number_conversions.cc
+    base/strings/stringprintf.cc
+    base/strings/utf_string_conversions.cc
+    base/synchronization/lock.cc
+    base/third_party/icu/icu_utf.cc
+    base/threading/thread_local_storage.cc 
 )
 
 if(NOT MINGW)
-    mc_append_sources(
-        strings/utf_string_conversion_utils.cc
+    target_sources(${LIB_NAME} PRIVATE
+        base/strings/utf_string_conversion_utils.cc
     )
 else()
-    mc_append_sources(
+    target_sources(${LIB_NAME} PRIVATE
         ../../utf_string_conversion_utils.mingw.cc
     )
 endif()
 
-if(APPLE)
-    mc_append_sources(
-        mac/close_nocancel.cc
-        mac/foundation_util.h
-        mac/foundation_util.mm
-        mac/mach_logging.cc
-        mac/mach_logging.h
-        mac/scoped_cftyperef.h
-        mac/scoped_ioobject.h
-        mac/scoped_launch_data.h
-        mac/scoped_mach_port.cc
-        mac/scoped_mach_port.h
-        mac/scoped_mach_vm.cc
-        mac/scoped_mach_vm.h
-        mac/scoped_nsautorelease_pool.h
-        mac/scoped_nsautorelease_pool.mm
-        mac/scoped_nsobject.h
-        mac/scoped_typeref.h
-        strings/sys_string_conversions_mac.mm
+if(APPLE)	
+    target_sources(${LIB_NAME} PRIVATE
+        base/mac/close_nocancel.cc
+        base/mac/foundation_util.mm
+        base/mac/mach_logging.cc
+        base/mac/scoped_mach_port.cc
+        base/mac/scoped_mach_vm.cc
+        base/mac/scoped_nsautorelease_pool.mm
+        base/strings/sys_string_conversions_mac.mm
     )
 endif()
 
 if(WIN32)
-    mc_append_sources(
-        process/process_metrics_win.cc
-        scoped_clear_last_error_win.cc
-        strings/string_util_win.cc
-        strings/string_util_win.h
-        synchronization/lock_impl_win.cc
-        threading/thread_local_storage_win.cc
+    target_sources(${LIB_NAME} PRIVATE
+        base/process/process_metrics_win.cc
+        base/scoped_clear_last_error_win.cc
+        base/strings/string_util_win.cc
+        base/synchronization/lock_impl_win.cc
+        base/threading/thread_local_storage_win.cc
     )
 else()
-    mc_append_sources(
-        files/file_util_posix.cc
-        posix/eintr_wrapper.h
-        posix/safe_strerror.cc
-        posix/safe_strerror.h
-        process/process_metrics_posix.cc
-        strings/string_util_posix.h
-        synchronization/condition_variable_posix.cc
-        synchronization/lock_impl_posix.cc
-        threading/thread_local_storage_posix.cc
+    target_sources(${LIB_NAME} PRIVATE
+        base/files/file_util_posix.cc
+        base/posix/safe_strerror.cc
+        base/process/process_metrics_posix.cc
+        base/synchronization/condition_variable_posix.cc
+        base/synchronization/lock_impl_posix.cc
+        base/threading/thread_local_storage_posix.cc
     )
 endif()
 
@@ -220,15 +146,6 @@ if(APPLE)
         "-framework Security"
     )
 endif()
-
-#target_include_directories(${LIB_NAME} PUBLIC
-#    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
-#    $<INSTALL_INTERFACE:include/crashpad/mini_chromium>
-#)
-#target_link_libraries(mini_chromium
-#    PRIVATE
-#        $<BUILD_INTERFACE:crashpad_interface>
-#)
 
 if(WIN32)
     target_link_libraries(${LIB_NAME} PRIVATE advapi32 kernel32)
@@ -251,11 +168,7 @@ if(WIN32)
     endif()
 endif()
 
-#add_library(crashpad::mini_chromium ALIAS mini_chromium)
 
-
-
-# Install
 if(NOT SKIP_INSTALL_LIBRARIES AND NOT SKIP_INSTALL_ALL)
     install(TARGETS ${TARGETS}
         EXPORT ${PACKAGE_UPPER_NAME}Targets
@@ -263,44 +176,54 @@ if(NOT SKIP_INSTALL_LIBRARIES AND NOT SKIP_INSTALL_ALL)
         ARCHIVE DESTINATION ${INSTALL_LIB_DIR}
         LIBRARY DESTINATION ${INSTALL_LIB_DIR}
         INCLUDES DESTINATION ${INSTALL_INC_DIR}
-        FRAMEWORK DESTINATION ${INSTALL_LIB_DIR})
+        FRAMEWORK DESTINATION ${INSTALL_LIB_DIR}
+	)
+
+	install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/base"
+		DESTINATION "${INSTALL_INC_DIR}"
+		FILES_MATCHING PATTERN "*.h"
+	)
+	
+	install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/build/build_config.h"
+		DESTINATION "${INSTALL_INC_DIR}/build/"
+	)
 endif()
+
+add_custom_target(uninstall COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
 
 # Export package ===============================================================
 
 # Add path to includes to build-tree export
 target_include_directories(${TARGETS} PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+ $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+ $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
 )
 
 # Add all targets to the build-tree export set
 export(TARGETS ${TARGETS}
-    FILE ${PROJECT_BINARY_DIR}/${PACKAGE_UPPER_NAME}Targets.cmake)
+   FILE ${PROJECT_BINARY_DIR}/${PACKAGE_UPPER_NAME}Targets.cmake)
 
 if(REGISTER_PACKAGE)
-    # Export the package for use from the build-tree
-    # (this registers the build-tree with a global CMake-registry)
-    export(PACKAGE ${PACKAGE_UPPER_NAME})
+   # Export the package for use from the build-tree
+   # (this registers the build-tree with a global CMake-registry)
+   export(PACKAGE ${PACKAGE_UPPER_NAME})
 endif()
 
-# Create the ZLIBConfig.cmake file
+# Create the MINICHROMIUMConfig.cmake file
 configure_file(cmake/PackageConfig.cmake.in
-    ${PROJECT_BINARY_DIR}/${PACKAGE_UPPER_NAME}Config.cmake @ONLY)
+   ${PROJECT_BINARY_DIR}/${PACKAGE_UPPER_NAME}Config.cmake @ONLY)
 
 if(NOT SKIP_INSTALL_LIBRARIES AND NOT SKIP_INSTALL_ALL)
-    # Install the <Package>Config.cmake
-    install(FILES
-      ${PROJECT_BINARY_DIR}/${PACKAGE_UPPER_NAME}Config.cmake
-      DESTINATION ${INSTALL_CMAKECONF_DIR} COMPONENT dev)
+   # Install the <Package>Config.cmake
+   install(FILES
+     ${PROJECT_BINARY_DIR}/${PACKAGE_UPPER_NAME}Config.cmake
+     DESTINATION ${INSTALL_CMAKECONF_DIR} COMPONENT dev)
 
-    # Install the export set for use with the install-tree
-    install(EXPORT ${PACKAGE_UPPER_NAME}Targets DESTINATION ${INSTALL_CMAKECONF_DIR} COMPONENT dev)
+   # Install the export set for use with the install-tree
+   install(EXPORT ${PACKAGE_UPPER_NAME}Targets DESTINATION ${INSTALL_CMAKECONF_DIR} COMPONENT dev)
 endif()
 
 # Archiving ====================================================================
-
-include(util)
 
 set(CPACK_PACKAGE_NAME "${PACKAGE_NAME}")
 set(CPACK_PACKAGE_VENDOR "${PACKAGE_VENDOR}")
@@ -317,8 +240,3 @@ get_cpack_filename(${VERSION} PROJECT_CPACK_FILENAME)
 set(CPACK_PACKAGE_FILE_NAME ${PROJECT_CPACK_FILENAME})
 
 include(CPack)
-
-if(BUILD_TESTINTG)
-    enable_testing()
-    add_test(sqlite_app ${PROJECT_NAME} -version)
-endif()
