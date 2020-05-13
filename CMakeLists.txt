@@ -72,11 +72,7 @@ include(util)
 set(VERSION 0.0.1)
 report_version(${PROJECT_NAME} ${VERSION})
 
-if(BUILD_SHARED_LIBS)
-	add_library(${LIB_NAME} SHARED)
-else()
-	add_library(${LIB_NAME} STATIC) 
-endif()
+add_library(${LIB_NAME} STATIC) 
 
 set_target_properties(${LIB_NAME} PROPERTIES VERSION ${VERSION})
 
