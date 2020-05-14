@@ -69,7 +69,8 @@ set(TARGETS ${LIB_NAME})
 
 include(util)
 
-set(VERSION 0.0.1)
+check_version(MAJOR_VER MINOR_VER REL_VER FIX_VER)
+set(VERSION ${MAJOR_VER}.${MINOR_VER}.${REL_VER})
 report_version(${PROJECT_NAME} ${VERSION})
 
 add_library(${LIB_NAME} STATIC) 

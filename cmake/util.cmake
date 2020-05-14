@@ -26,26 +26,28 @@
 # DEALINGS IN THE SOFTWARE.
 ################################################################################
 
-function(set_version major minor release filename)
-    file(READ ${filename} FILE_CONTENTS)
-    string(REGEX MATCH "SQLITE_VERSION_NUMBER[ \t]+([0-9]+)"
-      VERSION_NUMBER ${FILE_CONTENTS})
-    string(REGEX MATCH "([0-9]+)"
-      VERSION_NUMBER ${VERSION_NUMBER})
-    math(EXPR VERSION_MAJOR "${VERSION_NUMBER} / 1000000")
-    math(EXPR VERSION_MINOR "(${VERSION_NUMBER} - ${VERSION_MAJOR} * 1000000) / 1000")
-    math(EXPR VERSION_RELEASE "(${VERSION_NUMBER} - ${VERSION_MAJOR} * 1000000 - ${VERSION_MINOR} * 1000)")
+function(check_version major minor patch)
+
+	string(TIMESTAMP CURRENT_YEAR "%y")
+    string(TIMESTAMP CURRENT_MONTH "%m")
+    math(EXPR CURRENT_MONTH "${CURRENT_MONTH}*1")
+
+	set(VERSION_MAJOR ${CURRENT_YEAR})
+    set(VERSION_MINOR ${CURRENT_MONTH})
+    set(VERSION_PATCH 0)
+	
     set(${major} ${VERSION_MAJOR} PARENT_SCOPE)
     set(${minor} ${VERSION_MINOR} PARENT_SCOPE)
-    set(${release} ${VERSION_RELEASE} PARENT_SCOPE)
-
+    set(${patch} ${VERSION_PATCH} PARENT_SCOPE)
+	
     # Store version string in file for installer needs
-    file(TIMESTAMP ${CMAKE_SOURCE_DIR}/sqlite3.h VERSION_DATETIME "%Y-%m-%d %H:%M:%S" UTC)
-    set(VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_RELEASE})
+	file(TIMESTAMP ${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.txt VERSION_DATETIME "%Y-%m-%d %H:%M:%S" UTC)
+    set(VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
+	message(STATUS "VERSION: ${VERSION}")
     get_cpack_filename(${VERSION} PROJECT_CPACK_FILENAME)
     file(WRITE ${CMAKE_BINARY_DIR}/version.str "${VERSION}\n${VERSION_DATETIME}\n${PROJECT_CPACK_FILENAME}")
 
-endfunction()
+endfunction(check_version)
 
 function(report_version name ver)
     string(ASCII 27 Esc)
