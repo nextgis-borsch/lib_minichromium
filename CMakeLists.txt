@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (C) 2020, NextGIS <info@nextgis.com>
+# Copyright (C) 2020-2021, NextGIS <info@nextgis.com>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -87,7 +87,6 @@ target_sources(${LIB_NAME} PRIVATE
     base/logging.cc
     base/process/memory.cc
     base/rand_util.cc
-    base/strings/string16.cc
     base/strings/string_number_conversions.cc
     base/strings/stringprintf.cc
     base/strings/utf_string_conversions.cc
