@@ -32,7 +32,11 @@
 *.dSYM/
 
 # Build
+/build/*
 /inst
+
+# Ignore build folder except for build/build_config.h file
+!/build/build_config.h
 
 # Temp
 *~
