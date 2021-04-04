@@ -106,7 +106,7 @@ else()
     )
 endif()
 
-if(APPLE)	
+if(APPLE)
     target_sources(${LIB_NAME} PRIVATE
         base/mac/close_nocancel.cc
         base/mac/foundation_util.mm
@@ -177,16 +177,18 @@ if(NOT SKIP_INSTALL_LIBRARIES AND NOT SKIP_INSTALL_ALL)
         LIBRARY DESTINATION ${INSTALL_LIB_DIR}
         INCLUDES DESTINATION ${INSTALL_INC_DIR}
         FRAMEWORK DESTINATION ${INSTALL_LIB_DIR}
-	)
+    )
 
-	install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/base"
-		DESTINATION "${INSTALL_INC_DIR}"
-		FILES_MATCHING PATTERN "*.h"
-	)
-	
-	install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/build/build_config.h"
-		DESTINATION "${INSTALL_INC_DIR}/build/"
-	)
+    install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/base"
+        DESTINATION "${INSTALL_INC_DIR}"
+        FILES_MATCHING PATTERN "*.h"
+    )
+
+    install(FILES
+        ${CMAKE_CURRENT_SOURCE_DIR}/build/build_config.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/build/buildflag.h
+        DESTINATION "${INSTALL_INC_DIR}/build/"
+    )
 endif()
 
 add_custom_target(uninstall COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)

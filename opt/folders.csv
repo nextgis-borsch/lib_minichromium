@@ -13,4 +13,4 @@ base/strings,base/strings,,"h,cc,mm"
 base/synchronization,base/synchronization,,"h,cc"
 base/third_party/icu,base/third_party/icu,,"h,cc,LICENSE"
 base/threading,base/threading,,"h,cc"
-build,build,,build_config.h
+build,build,,h
