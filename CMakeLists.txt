@@ -91,20 +91,11 @@ target_sources(${LIB_NAME} PRIVATE
     base/strings/string_number_conversions.cc
     base/strings/stringprintf.cc
     base/strings/utf_string_conversions.cc
+    base/strings/utf_string_conversion_utils.cc
     base/synchronization/lock.cc
     base/third_party/icu/icu_utf.cc
     base/threading/thread_local_storage.cc 
 )
-
-if(NOT MINGW)
-    target_sources(${LIB_NAME} PRIVATE
-        base/strings/utf_string_conversion_utils.cc
-    )
-else()
-    target_sources(${LIB_NAME} PRIVATE
-        ../../utf_string_conversion_utils.mingw.cc
-    )
-endif()
 
 if(APPLE)
     target_sources(${LIB_NAME} PRIVATE
@@ -158,12 +149,6 @@ if(WIN32)
             _CRT_SECURE_NO_WARNINGS
             _HAS_EXCEPTIONS=0
             _UNICODE
-        )
-    elseif(MINGW)
-        target_compile_options(${LIB_NAME} PRIVATE 
-            "-municode"
-            "-Wno-format"
-            "-Wno-unknown-pragmas"
         )
     endif()
 endif()
