@@ -8,6 +8,7 @@
 #include <stdlib.h>
 
 #include <iomanip>
+#include <ostream>
 
 #if defined(OS_POSIX)
 #include <paths.h>
@@ -47,14 +48,13 @@
 #elif defined(OS_WIN)
 #include <intrin.h>
 #include <windows.h>
-#elif defined(OS_FUCHSIA)
-#include <zircon/process.h>
-#include <zircon/syscalls.h>
 #elif defined(OS_ANDROID)
 #include <android/log.h>
+#elif defined(OS_FUCHSIA)
+#include <lib/syslog/global.h>
 #endif
 
-#include "base/stl_util.h"
+#include "base/cxx17_backports.h"
 #include "base/strings/string_util.h"
 #include "base/strings/stringprintf.h"
 #include "base/strings/utf_string_conversions.h"
@@ -111,32 +111,13 @@ std::string SystemErrorCodeToString(unsigned long error_code) {
       msgbuf[len - 1] = '\0';
     }
     return base::StringPrintf("%s (%u)",
-                              base::UTF16ToUTF8(msgbuf).c_str(), error_code);
+                              base::WideToUTF8(msgbuf).c_str(), error_code);
   }
   return base::StringPrintf("Error %u while retrieving error %u",
                             GetLastError(),
                             error_code);
 }
 #endif  // OS_WIN
-
-#if defined(OS_FUCHSIA)
-zx_koid_t GetKoidForHandle(zx_handle_t handle) {
-  // Get the 64-bit koid (unique kernel object ID) of the given handle.
-  zx_koid_t koid = 0;
-  zx_info_handle_basic_t info;
-  if (zx_object_get_info(handle,
-                         ZX_INFO_HANDLE_BASIC,
-                         &info,
-                         sizeof(info),
-                         nullptr,
-                         nullptr) == ZX_OK) {
-    // If this fails, there's not much that can be done. As this is used only
-    // for logging, leave it as 0, which is not a valid koid.
-    koid = info.koid;
-  }
-  return koid;
-}
-#endif  // OS_FUCHSIA
 
 LogMessage::LogMessage(const char* function,
                        const char* file_path,
@@ -327,7 +308,7 @@ LogMessage::~LogMessage() {
 #endif
     }
 #elif defined(OS_WIN)
-    OutputDebugString(base::UTF8ToUTF16(str_newline).c_str());
+    OutputDebugString(base::UTF8ToWide(str_newline).c_str());
 #elif defined(OS_ANDROID)
     android_LogPriority priority =
         (severity_ < 0) ? ANDROID_LOG_VERBOSE : ANDROID_LOG_UNKNOWN;
@@ -347,6 +328,34 @@ LogMessage::~LogMessage() {
     }
     // The Android system may truncate the string if it's too long.
     __android_log_write(priority, "chromium", str_newline.c_str());
+#elif defined(OS_FUCHSIA)
+  fx_log_severity_t fx_severity;
+  switch (severity_) {
+    case LOG_INFO:
+      fx_severity = FX_LOG_INFO;
+      break;
+    case LOG_WARNING:
+      fx_severity = FX_LOG_WARNING;
+      break;
+    case LOG_ERROR:
+      fx_severity = FX_LOG_ERROR;
+      break;
+    case LOG_FATAL:
+      fx_severity = FX_LOG_FATAL;
+      break;
+    default:
+      fx_severity = FX_LOG_INFO;
+      break;
+  }
+  // Temporarily remove the trailing newline from |str_newline|'s C-string
+  // representation, since fx_logger will add a newline of its own.
+  str_newline.pop_back();
+  // Ideally the tag would be the same as the caller, but this is not supported
+  // right now.
+  fx_logger_log_with_source(fx_log_get_logger(), fx_severity, /*tag=*/nullptr,
+                            file_path_, line_,
+                            str_newline.c_str() + message_start_);
+  str_newline.push_back('\n');
 #endif  // OS_*
   }
 
@@ -383,9 +392,7 @@ void LogMessage::Init(const char* function) {
     file_name.assign(file_name.substr(last_slash + 1));
   }
 
-#if defined(OS_FUCHSIA)
-  zx_koid_t pid = GetKoidForHandle(zx_process_self());
-#elif defined(OS_POSIX)
+#if defined(OS_POSIX) && !defined(OS_FUCHSIA)
   pid_t pid = getpid();
 #elif defined(OS_WIN)
   DWORD pid = GetCurrentProcessId();
@@ -400,18 +407,22 @@ void LogMessage::Init(const char* function) {
   pid_t thread = static_cast<pid_t>(syscall(__NR_gettid));
 #elif defined(OS_WIN)
   DWORD thread = GetCurrentThreadId();
-#elif defined(OS_FUCHSIA)
-  zx_koid_t thread = GetKoidForHandle(zx_thread_self());
 #endif
 
+  // On Fuchsia, the platform is responsible for adding the process id and
+  // thread id, not the process itself.
+#if !defined(OS_FUCHSIA)
   stream_ << '['
           << pid
           << ':'
           << thread
           << ':'
           << std::setfill('0');
+#endif
 
-#if defined(OS_POSIX)
+  // On Fuchsia, the platform is responsible for adding the log timestamp,
+  // not the process itself.
+#if defined(OS_POSIX) && !defined(OS_FUCHSIA)
   timeval tv;
   gettimeofday(&tv, nullptr);
   tm local_time;
@@ -424,7 +435,8 @@ void LogMessage::Init(const char* function) {
           << std::setw(2) << local_time.tm_min
           << std::setw(2) << local_time.tm_sec
           << '.'
-          << std::setw(6) << tv.tv_usec;
+          << std::setw(6) << tv.tv_usec
+          << ':';
 #elif defined(OS_WIN)
   SYSTEMTIME local_time;
   GetLocalTime(&local_time);
@@ -436,22 +448,31 @@ void LogMessage::Init(const char* function) {
           << std::setw(2) << local_time.wMinute
           << std::setw(2) << local_time.wSecond
           << '.'
-          << std::setw(3) << local_time.wMilliseconds;
+          << std::setw(3) << local_time.wMilliseconds
+          << ':';
 #endif
 
-  stream_ << ':';
+  // On Fuchsia, ~LogMessage() will add the severity, filename and line
+  // number when LOG_TO_SYSTEM_DEBUG_LOG is enabled, but not on
+  // LOG_TO_STDERR so if LOG_TO_STDERR is enabled, print them here with
+  // potentially repetition if LOG_TO_SYSTEM_DEBUG_LOG is also enabled.
+#if defined(OS_FUCHSIA)
+  if ((g_logging_destination & LOG_TO_STDERR)) {
+#endif
+    if (severity_ >= 0) {
+      stream_ << log_severity_names[severity_];
+    } else {
+      stream_ << "VERBOSE" << -severity_;
+    }
 
-  if (severity_ >= 0) {
-    stream_ << log_severity_names[severity_];
-  } else {
-    stream_ << "VERBOSE" << -severity_;
+    stream_ << ' '
+            << file_name
+            << ':'
+            << line_
+            << "] ";
+#if defined(OS_FUCHSIA)
   }
-
-  stream_ << ' '
-          << file_name
-          << ':'
-          << line_
-          << "] ";
+#endif
 
   message_start_ = stream_.str().size();
 }
@@ -496,3 +517,7 @@ ErrnoLogMessage::~ErrnoLogMessage() {
 #endif  // OS_POSIX
 
 }  // namespace logging
+
+std::ostream& std::operator<<(std::ostream& out, const std::u16string& str) {
+  return out << base::UTF16ToUTF8(str);
+}

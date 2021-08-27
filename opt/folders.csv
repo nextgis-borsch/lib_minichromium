@@ -4,7 +4,7 @@ base/debug,base/debug,,"h,cc"
 base/files,base/files,,"h,cc"
 base/fuchsia,base/fuchsia,,"h,cc"
 base/mac,base/mac,,"h,cc,mm"
-base/memory,base/memory,,h
+base/memory,base/memory,,"h,cc"
 base/metrics,base/metrics,,h
 base/numerics,base/numerics,,h
 base/posix,base/posix,,"h,cc"

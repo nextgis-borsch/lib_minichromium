@@ -35,14 +35,10 @@ enum : LoggingDestination {
 
   LOG_TO_ALL = LOG_TO_FILE | LOG_TO_SYSTEM_DEBUG_LOG | LOG_TO_STDERR,
 
-// On Windows, use a file next to the exe.
-// On POSIX platforms, where it may not even be possible to locate the
-// executable on disk, use stderr.
-// On Fuchsia, use the Fuchsia logging service.
-#if defined(OS_FUCHSIA)
-  LOG_DEFAULT = LOG_TO_SYSTEM_DEBUG_LOG,
-#elif defined(OS_WIN)
+#if defined(OS_WIN)
   LOG_DEFAULT = LOG_TO_FILE,
+#elif defined(OS_FUCHSIA)
+  LOG_DEFAULT = LOG_TO_SYSTEM_DEBUG_LOG,
 #elif defined(OS_POSIX)
   LOG_DEFAULT = LOG_TO_SYSTEM_DEBUG_LOG | LOG_TO_STDERR,
 #endif
@@ -308,5 +304,9 @@ const LogSeverity LOG_0 = LOG_ERROR;
 
 #undef assert
 #define assert(condition) DLOG_ASSERT(condition)
+
+namespace std {
+ostream& operator<<(ostream& out, const u16string& str);
+}  // namespace std
 
 #endif  // MINI_CHROMIUM_BASE_LOGGING_H_

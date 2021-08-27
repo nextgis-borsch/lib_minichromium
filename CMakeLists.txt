@@ -81,50 +81,115 @@ add_library(${LIB_NAME} STATIC)
 set_target_properties(${LIB_NAME} PROPERTIES VERSION ${VERSION})
 
 target_sources(${LIB_NAME} PRIVATE
-    base/debug/alias.cc
-    base/files/file_path.cc
-    base/files/scoped_file.cc
-    base/logging.cc
-    base/process/memory.cc
-    base/rand_util.cc
-    base/strings/string16.cc
-    base/strings/string_number_conversions.cc
-    base/strings/stringprintf.cc
-    base/strings/utf_string_conversions.cc
-    base/strings/utf_string_conversion_utils.cc
-    base/synchronization/lock.cc
-    base/third_party/icu/icu_utf.cc
-    base/threading/thread_local_storage.cc 
+    ${CMAKE_CURRENT_SOURCE_DIR}/build/build_config.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/atomicops.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/atomicops_internals_atomicword_compat.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/atomicops_internals_portable.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/auto_reset.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/bit_cast.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/check.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/check_op.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/compiler_specific.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/cxx17_backports.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/debug/alias.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/debug/alias.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/files/file_path.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/files/file_path.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/files/file_util.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/files/scoped_file.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/files/scoped_file.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/format_macros.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/logging.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/logging.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/macros.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/memory/free_deleter.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/memory/page_size.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/memory/scoped_policy.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/metrics/histogram_functions.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/metrics/histogram_macros.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/metrics/persistent_histogram_allocator.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/notreached.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/numerics/checked_math.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/numerics/checked_math_impl.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/numerics/clamped_math.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/numerics/clamped_math_impl.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/numerics/safe_conversions.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/numerics/safe_conversions_arm_impl.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/numerics/safe_conversions_impl.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/numerics/safe_math.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/numerics/safe_math_arm_impl.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/numerics/safe_math_clang_gcc_impl.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/numerics/safe_math_shared_impl.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/process/memory.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/process/memory.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/rand_util.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/rand_util.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/scoped_clear_last_error.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/scoped_generic.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/strings/string_number_conversions.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/strings/string_number_conversions.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/strings/string_piece.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/strings/string_util.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/strings/stringprintf.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/strings/stringprintf.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/strings/sys_string_conversions.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/strings/utf_string_conversion_utils.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/strings/utf_string_conversions.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/strings/utf_string_conversions.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/synchronization/condition_variable.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/synchronization/lock.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/synchronization/lock.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/synchronization/lock_impl.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/sys_byteorder.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/template_util.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/third_party/icu/icu_utf.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/third_party/icu/icu_utf.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/threading/thread_local_storage.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/threading/thread_local_storage.h
 )
 
 if(APPLE)
     target_sources(${LIB_NAME} PRIVATE
-        base/mac/close_nocancel.cc
-        base/mac/foundation_util.mm
-        base/mac/mach_logging.cc
-        base/mac/scoped_mach_port.cc
-        base/mac/scoped_mach_vm.cc
-        base/mac/scoped_nsautorelease_pool.mm
-        base/strings/sys_string_conversions_mac.mm
+        ${CMAKE_CURRENT_SOURCE_DIR}/base/mac/close_nocancel.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/base/mac/foundation_util.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/base/mac/foundation_util.mm
+        ${CMAKE_CURRENT_SOURCE_DIR}/base/mac/mach_logging.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/base/mac/mach_logging.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/base/mac/scoped_cftyperef.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/base/mac/scoped_ioobject.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/base/mac/scoped_launch_data.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/base/mac/scoped_mach_port.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/base/mac/scoped_mach_port.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/base/mac/scoped_mach_vm.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/base/mac/scoped_mach_vm.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/base/mac/scoped_nsautorelease_pool.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/base/mac/scoped_nsautorelease_pool.mm
+        ${CMAKE_CURRENT_SOURCE_DIR}/base/mac/scoped_nsobject.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/base/mac/scoped_typeref.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/base/strings/sys_string_conversions_mac.mm
     )
 endif()
 
 if(WIN32)
     target_sources(${LIB_NAME} PRIVATE
-        base/process/process_metrics_win.cc
-        base/scoped_clear_last_error_win.cc
-        base/strings/string_util_win.cc
-        base/synchronization/lock_impl_win.cc
-        base/threading/thread_local_storage_win.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/base/memory/page_size_win.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/base/scoped_clear_last_error_win.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/base/strings/string_util_win.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/base/strings/string_util_win.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/base/synchronization/lock_impl_win.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/base/threading/thread_local_storage_win.cc
     )
 else()
     target_sources(${LIB_NAME} PRIVATE
-        base/files/file_util_posix.cc
-        base/posix/safe_strerror.cc
-        base/process/process_metrics_posix.cc
-        base/synchronization/condition_variable_posix.cc
-        base/synchronization/lock_impl_posix.cc
-        base/threading/thread_local_storage_posix.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/base/files/file_util_posix.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/base/memory/page_size_posix.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/base/posix/eintr_wrapper.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/base/posix/safe_strerror.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/base/posix/safe_strerror.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/base/strings/string_util_posix.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/base/synchronization/condition_variable_posix.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/base/synchronization/lock_impl_posix.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/base/threading/thread_local_storage_posix.cc
     )
 endif()
 
