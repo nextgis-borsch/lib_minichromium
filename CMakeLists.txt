@@ -134,6 +134,7 @@ target_sources(${LIB_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/base/strings/stringprintf.h
     ${CMAKE_CURRENT_SOURCE_DIR}/base/strings/sys_string_conversions.h
     ${CMAKE_CURRENT_SOURCE_DIR}/base/strings/utf_string_conversion_utils.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/base/strings/utf_string_conversion_utils.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/base/strings/utf_string_conversions.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/base/strings/utf_string_conversions.h
     ${CMAKE_CURRENT_SOURCE_DIR}/base/synchronization/condition_variable.h
